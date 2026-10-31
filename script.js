@@ -22,3 +22,21 @@ document.querySelectorAll('[data-theme]').forEach(button => button.addEventListe
   });
 }));
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// Respect reduced motion and preserve full content for users without JS.
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+if (!reducedMotion.matches && 'IntersectionObserver' in window) {
+  const revealItems = document.querySelectorAll('.section-heading, .feature-card, .toolkit-heading, .toolkit-card, .toolkit-footer, .statement-inner, .experience-text, .experience-panel, .step, .faq-grid, .download-inner');
+  const observer = new IntersectionObserver((entries, instance) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('motion-visible');
+      instance.unobserve(entry.target);
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -25px 0px' });
+  revealItems.forEach(node => {
+    node.classList.add('motion-reveal');
+    observer.observe(node);
+  });
+  document.documentElement.classList.add('has-motion');
+}
